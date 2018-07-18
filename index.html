@@ -41,7 +41,7 @@
     <div>
         <div class="add">
             编号:
-            <input v-model="id" type="text"> 品牌名称:
+            <input v-model="id" type="number"> 品牌名称:
             <input v-model="name" type="text" @keyup.enter="add">
             <input type="button" @click="add" value="添加">
         </div>
@@ -67,6 +67,9 @@
                     <a href="#" @click="dele(item.id)">删 除</a>
                 </td>
             </tr>
+            <template name="fade">
+                <p>hello</p>
+            </template>
             <tr v-if="this.brandList.length==0">
                 <td colspan="4">没有多余的内容了</td>
             </tr>
@@ -84,24 +87,40 @@
             data() {
                 return {
                     brandList: [{
-                            id: 1,
-                            name: '宝马',
-                            ctime: new Date().toLocaleTimeString()
-                        },
-                        {
-                            id: 2,
-                            name: '比亚迪',
-                            ctime: new Date().toLocaleTimeString()
-                        },
-                        {
-                            id: 3,
-                            name: '兰博基尼',
-                            ctime: new Date().toLocaleTimeString()
-                        }
+                        id: 1,
+                        name: '宝马',
+                        ctime: new Date().toLocaleTimeString()
+                    },
+                    {
+                        id: 2,
+                        name: '比亚迪',
+                        ctime: new Date().toLocaleTimeString()
+                    },
+                    {
+                        id: 3,
+                        name: '兰博基亚',
+                        ctime: new Date().toLocaleTimeString()
+                    }
+                    ],
+                    newBrandList: [{
+                        id: 1,
+                        name: '宝马',
+                        ctime: new Date().toLocaleTimeString()
+                    },
+                    {
+                        id: 2,
+                        name: '比亚迪',
+                        ctime: new Date().toLocaleTimeString()
+                    },
+                    {
+                        id: 3,
+                        name: '兰博基尼',
+                        ctime: new Date().toLocaleTimeString()
+                    }
                     ],
                     id: '',
                     name: '',
-                    keyword:''
+                    keyword: ''
                 }
             },
             methods: {
@@ -146,18 +165,25 @@
                     */
                     for (const item of this.brandList) {
                         if (this.id == item.id) {
+                            this.id = '';
+                            this.name = '';
                             alert('序号不能相同!')
                             flag = false;
                             return
                         } else if (this.id == '') {
                             alert('序号不能为空');
+                            this.name = '';
                             flag = false;
                             return
                         } else if (this.name == '') {
                             alert('品牌不能为空');
+                            this.id = '';
                             flag = false;
                             return
                         } else if (this.name == item.name) {
+                            alert('品牌不能一样');
+                            this.id = '';
+                            this.name = '';
                             flag = false;
                             return
                         }
@@ -170,6 +196,8 @@
                             // 添加一条数据  push进 brandList数组             
                             ctime: new Date().toLocaleTimeString()
                         })
+                        this.id = '';
+                        this.name = '';
                     }
                 },
                 dele(id) {
@@ -179,10 +207,20 @@
                         }
                     )
                     console.log(index);
-                    this.brandList.splice(index, 3)
+                    this.brandList.splice(index, 1)
+                    this.newBrandList.splice(index, 1)
                 },
-                search(){
-                    alert(this.keyword)
+                search() {
+                    if (this.keyword != '') {
+                        const keyword = this.brandList.filter(item => {
+                            return item.name.includes(this.keyword)
+                        })
+                        this.brandList = keyword
+                        console.log(keyword);
+                    } else {
+                        this.brandList = this.newBrandList
+                    }
+
                 }
             }
 
