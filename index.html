@@ -1,37 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Hotglacier</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <title>品牌管理</title>
+    <script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
     <style>
-        body{
-            margin: 0;
-            padding: 0;
-            background-color: #9a9a9a;
+        #app {
+            width: 600px;
+            margin: 10px auto;
         }
-        div{
+
+        .tb {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .tb th {
+            background-color: #0094ff;
+            color: white;
+        }
+
+        .tb td,
+        .tb th {
+            padding: 5px;
+            border: 1px solid black;
             text-align: center;
         }
-        h2{
-            margin-top: 200px;
+
+        .add {
+            padding: 5px;
+            border: 1px solid black;
+            margin-bottom: 10px;
         }
     </style>
 </head>
-<body>
-    <div id="dashigea">
-        <h2 v-text="hello"></h2>
+<script type="text/html" id="templateId">
+    <div>
+        <div class="add">
+            编号:
+            <input v-model="id" type="text"> 品牌名称:
+            <input v-model="name" type="text" @keyup.enter="add">
+            <input type="button" @click="add" value="添加">
+        </div>
+
+        <div class="add">
+            品牌名称:
+            <!-- 如果我们调用的函数，没有参数，我们可以加()，也可以不加 -->
+            <input type="text" @keyup.13="search()" v-model="keyword" placeholder="请输入搜索条件">
+        </div>
+        <table class="tb">
+            <tr>
+                <th>编号</th>
+                <th>品牌名称</th>
+                <th>创立时间</th>
+                <th>操作</th>
+            </tr>
+            <!-- 动态生成内容tr -->
+            <tr v-for="item in brandList" :key="item.id">
+                <td>{{item.id}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.ctime}}</td>
+                <td>
+                    <a href="#" @click="dele(item.id)">删 除</a>
+                </td>
+            </tr>
+            <tr v-if="this.brandList.length==0">
+                <td colspan="4">没有多余的内容了</td>
+            </tr>
+        </table>
     </div>
-    <script>    
-        new Vue({
-            el:'#dashigea',
-            data:{
-                hello:'不好意思，主页正在维护。。。'
+</script>
+
+<body>
+    <div id="app">
+        <brand-manager></brand-manager>
+    </div>
+    <script>
+        Vue.component('brand-manager', {
+            template: `#templateId`,
+            data() {
+                return {
+                    brandList: [{
+                            id: 1,
+                            name: '宝马',
+                            ctime: new Date().toLocaleTimeString()
+                        },
+                        {
+                            id: 2,
+                            name: '比亚迪',
+                            ctime: new Date().toLocaleTimeString()
+                        },
+                        {
+                            id: 3,
+                            name: '兰博基尼',
+                            ctime: new Date().toLocaleTimeString()
+                        }
+                    ],
+                    id: '',
+                    name: '',
+                    keyword:''
+                }
+            },
+            methods: {
+                add() {
+                    // console.log(this.id);
+                    // 定义一个标准变量
+                    let flag = true;
+                    /**
+                    // forEach 不能用return 跳出函数
+                    this.brandList.forEach(ele => {
+                        // 如果id(序号)相同
+                        if (this.id == ele.id) {
+                            console.log(this.id);
+                            console.log("------------");
+                            console.log(ele.id);
+                            this.id = '';
+                            this.name = '';
+                            num = 1;
+                            alert('序号相同!');
+                            return;
+                            // 如果名字为空
+                        } else if (this.name === '' && num == 0) {
+                            this.id = '';
+                            num = 2;
+                            alert('名字不能为空!');
+                            return;
+                            // 如果序号为空
+                        } else if (this.id == '' && num == 0) {
+                            this.name = ''
+                            alert('序号不能为空!');
+                            num = 3
+                            return;
+                        }
+                    });
+                    if (num == 0 && this.id != '') {
+                        this.brandList.push({
+                            id: this.id,
+                            name: this.name,
+                            ctime: new Date().toLocaleTimeString()
+                        })
+                    }
+                    */
+                    for (const item of this.brandList) {
+                        if (this.id == item.id) {
+                            alert('序号不能相同!')
+                            flag = false;
+                            return
+                        } else if (this.id == '') {
+                            alert('序号不能为空');
+                            flag = false;
+                            return
+                        } else if (this.name == '') {
+                            alert('品牌不能为空');
+                            flag = false;
+                            return
+                        } else if (this.name == item.name) {
+                            flag = false;
+                            return
+                        }
+                    }
+                    // console.log(flag);
+                    if (flag) {
+                        this.brandList.push({
+                            id: parseInt(this.id),
+                            name: this.name,
+                            // 添加一条数据  push进 brandList数组             
+                            ctime: new Date().toLocaleTimeString()
+                        })
+                    }
+                },
+                dele(id) {
+                    const index = this.brandList.findIndex(
+                        item => {
+                            return item.id === id
+                        }
+                    )
+                    console.log(index);
+                    this.brandList.splice(index, 3)
+                },
+                search(){
+                    alert(this.keyword)
+                }
             }
-            
+
+        })
+        new Vue({
+            el: "#app"
         })
     </script>
 </body>
+
 </html>
