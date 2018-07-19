@@ -59,15 +59,15 @@
                 <th>操作</th>
             </tr>
             <!-- 动态生成内容tr -->
-            <tr v-for="item in brandList" :key="item.id">
+            <tr v-for="item in superBrandList" :key="item.id">
                 <td>{{item.id}}</td>
                 <td>{{item.name}}</td>
-                <td>{{item.ctime}}</td>
+                <td>{{item.ctime | dateFmt('/')}}</td>
                 <td>
                     <a href="#" @click="dele(item.id)">删 除</a>
                 </td>
             </tr>
-            <tr v-if="this.brandList.length==0">
+            <tr v-if="this.superBrandList.length==0">
                 <td colspan="4">没有多余的内容了</td>
             </tr>
         </table>
@@ -81,6 +81,15 @@
     <script>
         Vue.component('brand-manager', {
             template: `#templateId`,
+            filters:{
+                dateFmt(input,operator='-'){
+                    const date = new Date()
+                    const year = date.getFullYear()
+                    const month = date.getMonth()+1
+                    const day = date.getDate()
+                    return `${year}${operator}${month}${operator}${day}`
+                }
+            },
             data() {
                 return {
                     brandList: [{
@@ -118,6 +127,13 @@
                     id: '',
                     name: '',
                     keyword: ''
+                }
+            },
+            computed:{
+                superBrandList(){
+                    return this.brandList.filter(item=>{
+                        return item.name.includes(this.keyword)
+                    })
                 }
             },
             methods: {
@@ -193,6 +209,12 @@
                             // 添加一条数据  push进 brandList数组             
                             ctime: new Date().toLocaleTimeString()
                         })
+                        this.newBrandList.push({
+                            id: parseInt(this.id),
+                            name: this.name,
+                            // 添加一条数据  push进 brandList数组             
+                            ctime: new Date().toLocaleTimeString()
+                        })
                         this.id = '';
                         this.name = '';
                     }
@@ -201,21 +223,27 @@
                     const index = this.brandList.findIndex(
                         item => {
                             return item.id === id
-                        }
+                        },
                     )
-                    console.log(index);
+                    console.log(id);
+                    const newIndex = this.newBrandList.findIndex(
+                        item => {
+                            return item.id === id
+                        },
+                    )
+                    console.log(newIndex);
                     this.brandList.splice(index, 1)
-                    this.newBrandList.splice(index, 1)
+                    this.newBrandList.splice(newIndex, 1)
                 },
                 search() {
-                    if (this.keyword != '') {
+                    if (this.keyword.trim().length==0) {
+                        this.brandList = this.newBrandList
+                    } else {
                         const keyword = this.brandList.filter(item => {
                             return item.name.includes(this.keyword)
                         })
                         this.brandList = keyword
                         console.log(keyword);
-                    } else {
-                        this.brandList = this.newBrandList
                     }
 
                 }
